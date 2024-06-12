@@ -1,0 +1,63 @@
+rm(list=ls())
+# Step 1: Install and load the necessary libraries
+install.packages("AHPtools")
+install.packages("ahpsurvey")
+
+library(AHPtools)
+
+# Step 2: Define the criteria and their pairwise comparisons
+criteria <- c("Performance", "Quality", "Style", "Price")
+criteria_comparisons <- matrix(c(
+  1,   2,   3,   5,   # Performance
+  1/2, 1,   2,   3,   # Quality
+  1/3, 1/2, 1,   2,   # Style
+  1/5, 1/3, 1/2, 1    # Price
+), nrow = 4, byrow = TRUE)
+rownames(criteria_comparisons) <- criteria
+colnames(criteria_comparisons) <- criteria
+
+# Define the alternatives
+alternatives <- c("Fridge1", "Fridge2", "Fridge3", "Fridge4", "Fridge5", 
+                  "Fridge6", "Fridge7", "Fridge8", "Fridge9", "Fridge10", 
+                  "Fridge11", "Fridge12", "Fridge13", "Fridge14", "Fridge15")
+
+# For simplicity, assume equal pairwise comparisons for alternatives under each criterion
+create_comparisons <- function(alternatives) {
+  n <- length(alternatives)
+  comparisons <- matrix(1, nrow = n, ncol = n)
+  rownames(comparisons) <- alternatives
+  colnames(comparisons) <- alternatives
+  return(comparisons)
+}
+
+# Create the pairwise comparisons for each criterion
+alternatives_comparisons <- lapply(criteria, function(crit) create_comparisons(alternatives))
+names(alternatives_comparisons) <- criteria
+
+# Step 3: Define the function to perform AHP analysis using AHPtools
+
+# Function to compute AHP priority vectors
+compute_ahp <- function(criteria_comparisons, alternatives_comparisons) {
+  # Calculate the priority vector for criteria
+  criteria_weights <- ahptools::calcWeights(criteria_comparisons)
+  
+#Calculate the priority vectors for each set of alternatives comparisons
+  alternative_weights <- lapply(alternatives_comparisons, AHPtools::calcWeights)
+  
+#Combine the results into a final ranking
+  final_scores <- sapply(alternative_weights, function(weights) {
+    weights %*% criteria_weights
+  })
+  
+#Rank the alternatives
+  final_ranking <- colMeans(final_scores)
+  ranked_alternatives <- sort(final_ranking, decreasing = TRUE)
+  
+  return(ranked_alternatives)
+}
+
+#Perform the AHP analysis
+result <- compute_ahp(criteria_comparisons, alternatives_comparisons)
+
+#Print the results
+print(result)

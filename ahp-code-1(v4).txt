@@ -1,0 +1,40 @@
+# Step 1: Install and load the necessary libraries
+install.packages("AHPtools")
+
+library(AHPtools)
+
+# Step 2: Define the criteria and their weights
+criteria <- c("Performance", "Quality", "Style", "Price")
+weights <- c(0.4, 0.3, 0.2, 0.1)
+
+# Define the alternatives
+alternatives <- c("Fridge1", "Fridge2", "Fridge3", "Fridge4", "Fridge5", 
+                  "Fridge6", "Fridge7", "Fridge8", "Fridge9", "Fridge10", 
+                  "Fridge11", "Fridge12", "Fridge13", "Fridge14", "Fridge15")
+
+# Step 3: Define pairwise comparisons for criteria and alternatives
+
+# Pairwise comparisons for the criteria
+criteria_comparisons <- matrix(c(
+  1,   2,   3,   5,  # Performance
+  0.5, 1,   2,   3,  # Quality
+  0.333, 0.5, 1,   2,  # Style
+  0.2, 0.333, 0.5, 1   # Price
+), nrow = 4, byrow = TRUE)
+
+# Initialize an empty list to store comparisons for each criterion
+alternatives_comparisons <- list()
+
+# Create dummy comparisons for each criterion
+# Here, we assume all comparisons are equally weighted (1) for simplicity
+for (criterion in criteria) {
+  comparisons <- matrix(1, nrow = length(alternatives), ncol = length(alternatives))
+  colnames(comparisons) <- rownames(comparisons) <- alternatives
+  alternatives_comparisons[[criterion]] <- comparisons
+}
+
+# Step 4: Perform the AHP analysis and get the results
+result <- ahp(criteria, criteria_comparisons, alternatives, alternatives_comparisons, weights)
+
+# Print the result
+print(result)
