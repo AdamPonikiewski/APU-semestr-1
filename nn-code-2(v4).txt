@@ -1,0 +1,41 @@
+#Wczytujemy potrzebne biblioteki
+library("neuralnet")
+
+#Ustalamy ziarno, aby wyniki były powtarzalne
+set.seed(123)
+
+#Generujemy dane wejściowe x w zakres [1, 10]
+x <- seq(1, 10, by = 0.1)
+
+#Obliczamy wartości wyjściowe f(x) = log(x^2)
+y <- log(x^2)
+
+#Tworzymy ramkę danych z danymi wejściowymi i wyjściowymi
+trainingdata <- data.frame(x = x, y = y)
+
+#Trenujemy sieć neuronową
+#Używamy 10 neuronów w warstwie ukrytej (możemy to dostosować do naszych potrzeb)
+#Używamy błędu kwadratowego jako funkcji kosztu
+net <- neuralnet(y ~ x, data = trainingdata, hidden = 10, act.fct = "logistic", linear.output = TRUE, threshold = 0.01)
+
+#Wyświetlamy informacje o sieci neuronowej
+print(net)
+
+#Rysujemy sieć neuronową
+plot(net)
+
+#Generujemy nowe dane testowe
+test_x <- seq(1, 10, by = 0.05)
+
+#Obliczamy prawdziwe wartości y dla danych testowych
+true_y <- log(test_x^2)
+
+#Przewidujemy wartości y za pomocą naszej sieci neuronowej
+net.results <- compute(net, data.frame(x = test_x))
+
+#Obliczamy błąd kwadratowy
+error <- sum((net.results$net.result - true_y)^2)
+
+#Wyświetlamy błąd kwadratowy
+print(paste("Błąd kwadratowy: ", error))
+
